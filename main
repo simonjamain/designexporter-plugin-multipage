@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+require 'byebug'
+require 'yaml'
+require_relative 'multipage.rb'
+
+configurationFile = ARGV[0].to_s
+
+# charger la configuration
+configuration = YAML.load(File.read(configurationFile))['multipage']
+
+# pour chaque fichier source/destination
+configuration.each do |options|
+  multipage options['in'], options['out']
+end
