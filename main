@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
-require 'byebug'
 require 'yaml'
 require_relative 'multipage.rb'
+
+def isAnterior?(oldFile, newFile)
+  File.mtime(oldFile) < File.mtime(newFile)
+end
 
 configurationFile = ARGV[0].to_s
 
@@ -10,6 +13,14 @@ configurationFile = ARGV[0].to_s
 configuration = YAML.load(File.read(configurationFile))['multipage']
 
 # pour chaque fichier source/destination
-configuration.each do |options|
-  multipage options['in'], options['out']
+Dir.chdir(File.dirname(configurationFile)) do
+  configuration.each do |options|
+
+    begin
+      next if isAnterior? options['in'], object['out']
+    rescue
+    end
+
+    multipage options['in'], options['out'] if File.readable?(options['in'])
+  end
 end
