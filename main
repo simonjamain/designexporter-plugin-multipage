@@ -17,7 +17,7 @@ Dir.chdir(File.dirname(configurationFile)) do
   configuration.each do |options|
 
     begin
-      next if isAnterior? options['in'], object['out']
+      next if isAnterior? options['in'], options['out']
     rescue
     end
 
