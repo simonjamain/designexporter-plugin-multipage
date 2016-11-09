@@ -28,8 +28,11 @@ def multipage (sourceFileName, outputFileName)
     unless svgToEdit.xpath('//svg:g[@inkscape:groupmode="layer"]').empty? then
 
       #force layer display
-      svgToEdit.xpath('//svg:g[@inkscape:groupmode="layer"]').each do |svgLayer|
-          svgLayer.attributes['style'].value = 'display:inline'
+      begin#in case style attribute is not present
+        svgToEdit.xpath('//svg:g[@inkscape:groupmode="layer"]').each do |svgLayer|
+            svgLayer.attributes['style'].value = 'display:inline'
+        end
+      rescue
       end
 
       #give a name for temporary file
@@ -56,14 +59,20 @@ def multipage (sourceFileName, outputFileName)
     end
   end
 
-  if pageNumber > 1
+  if tmpPdfFiles.size >= 1
     # merge pdfs and remove them
     pdfShellList = tmpPdfFiles.map { |file| file.path.shellescape }.join(" ")
 
     # ensure path exists
     FileUtils.mkpath(File.dirname(outputFileName))
-
-    print "#{outputFileName} produced.\n" if system "pdfunite #{pdfShellList} #{outputFileName.shellescape}"
+    require 'byebug'
+    byebug
+    case
+    when tmpPdfFiles.size == 1#just copy if only one file
+      print "#{outputFileName} produced.\n" if system "cp #{tmpPdfFiles.first.path.shellescape} #{outputFileName.shellescape}"
+    when tmpPdfFiles.size > 1#assemble if multiple file
+      print "#{outputFileName} produced.\n" if system "pdfunite #{pdfShellList} #{outputFileName.shellescape}"
+    end
 
     tmpPdfFiles.each { |tmpPdfFile| tmpPdfFile.close(true) }
 
