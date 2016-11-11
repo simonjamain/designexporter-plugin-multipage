@@ -2,7 +2,6 @@ require 'nokogiri'
 require 'fileutils'
 require 'shellwords'
 require 'tempfile'
-require 'byebug'
 
 def multipage (sourceFileName, outputFileName)
   #load source file
@@ -65,8 +64,7 @@ def multipage (sourceFileName, outputFileName)
 
     # ensure path exists
     FileUtils.mkpath(File.dirname(outputFileName))
-    require 'byebug'
-    byebug
+
     case
     when tmpPdfFiles.size == 1#just copy if only one file
       print "#{outputFileName} produced.\n" if system "cp #{tmpPdfFiles.first.path.shellescape} #{outputFileName.shellescape}"
